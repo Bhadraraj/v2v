@@ -1,0 +1,111 @@
+* {
+  font-family: "EB Garamond", serif;
+  /* font-family: "Inknut Antiqua", serif; */
+}
+
+:root {
+  --primary-color: #7476B0;
+  --secondary-color: #EAEAF2;
+  --heading-color: #233876;
+  --card-bg: #E1F0E6;
+  --input-bg: #F2F0F9;
+  --button-bg: #2C2A38;
+  --light-white: #FDFCFD;
+  --black-clr: #000208;
+  --faded-color:#F6F6F6;
+
+}
+
+h1 {
+  font-size: 52px;
+  color: var(--black-clr) !important;
+}
+
+
+h2 {
+  color: var(--heading-color) !important;
+  font-size: 50px;
+  font-weight: bold;
+
+
+}
+
+/* NAV BAR STARTS HERE  */
+.bg-body-tertiary {
+  background-color: var(--light-white) !important;
+  box-shadow: 0.5px 0.5px 8px var(--primary-color);
+}
+
+/* NAV BAR STARTS HERE  */
+
+
+
+/* SECTION PADDING STARTS HERE  */
+
+.introSec,
+.aboutUs,
+.instructionSec {
+  padding: 50px 0px;
+}
+
+
+
+
+/* iNTRO SECTION STARTS HERE  */
+
+
+.titleHighlight {
+  color: var(--primary-color);
+}
+
+
+h1 {
+  color: var(--heading-color);
+}
+
+.introSec p {
+  font-size: 20px;
+}
+
+.introSec {
+  background-color: var(--secondary-color);
+}
+
+/* iNTRO SECTION ENDS HERE  */
+
+
+
+/* ABOUT US SECTION STARTS HERE  */
+
+.aboutUs {}
+
+/* ABOUT US SECTION STARTS HERE  */
+
+
+
+
+/* INSTRUCTION SEC STARTS HERE  */
+.instrCard {
+  min-height: 210px;
+  /* width: 350px; */
+  padding: 25px !important;
+  border-radius: 20px;
+  box-shadow: 0.3px 0.3px 8px var(--primary-color);
+}
+
+
+.instructTitle {
+  font-weight: 700;
+}
+
+/* INSTRUCTION SEC STARTS HERE  */
+
+
+.instructionSec{
+
+  background-color: var(--faded-color);
+}
+.instructionSec .purple {
+background-color: var(--primary-color);
+color: var(--light-white);
+}
