@@ -9,7 +9,7 @@ const InstructionSec = () => {
 
                     <h2 className='text-center mb-4'>INSTRUCTION</h2>
 
-                    <div className="col-lg-3 col-md-6">
+                    <div className=" col-xl-3 col-lg-6 ">
                         <div className="instrCard purple">
 
                             <p className="instructTitle">
@@ -21,7 +21,7 @@ const InstructionSec = () => {
                         </div>
                     </div>
 
-                    <div className="col-lg-3 col-md-6">
+                    <div className=" col-xl-3 col-lg-6 ">
 
                         <div className="instrCard white">
 
@@ -33,7 +33,7 @@ const InstructionSec = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="col-lg-3 col-md-6">
+                    <div className=" col-xl-3 col-lg-6 ">
                         <div className="instrCard white">
 
                             <p className="instructTitle">
@@ -44,7 +44,7 @@ const InstructionSec = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="col-lg-3 col-md-6">
+                    <div className=" col-xl-3 col-lg-6 ">
                         <div className="instrCard purple">
 
                             <p className="instructTitle">

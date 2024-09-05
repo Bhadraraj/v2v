@@ -1,5 +1,7 @@
 * {
-  font-family: "EB Garamond", serif;
+  /* font-family: "EB Garamond", serif; */
+  /* font-family: "EB Garamond", serif; */
+  font-family: "Monda", sans-serif;
   /* font-family: "Inknut Antiqua", serif; */
 }
 
@@ -7,18 +9,20 @@
   --primary-color: #7476B0;
   --secondary-color: #EAEAF2;
   --heading-color: #233876;
-  --card-bg: #E1F0E6;
+  --card-bg: #F5FAF7;
   --input-bg: #F2F0F9;
   --button-bg: #2C2A38;
   --light-white: #FDFCFD;
   --black-clr: #000208;
-  --faded-color:#F6F6F6;
+  --faded-color: #F6F6F6;
+  --grey-color: #6B7280;
 
 }
 
 h1 {
   font-size: 52px;
   color: var(--black-clr) !important;
+  font-weight: bold;
 }
 
 
@@ -27,7 +31,12 @@ h2 {
   font-size: 50px;
   font-weight: bold;
 
+  text-transform: uppercase;
 
+}
+
+p{
+  font-style: normal;
 }
 
 /* NAV BAR STARTS HERE  */
@@ -44,7 +53,9 @@ h2 {
 
 .introSec,
 .aboutUs,
-.instructionSec {
+.instructionSec,
+.startExamSec,
+.contactSupport {
   padding: 50px 0px;
 }
 
@@ -64,7 +75,7 @@ h1 {
 }
 
 .introSec p {
-  font-size: 20px;
+  /* font-size: 20px; */
 }
 
 .introSec {
@@ -101,11 +112,243 @@ h1 {
 /* INSTRUCTION SEC STARTS HERE  */
 
 
-.instructionSec{
+.instructionSec {
 
   background-color: var(--faded-color);
 }
+
 .instructionSec .purple {
-background-color: var(--primary-color);
-color: var(--light-white);
+  background-color: var(--primary-color);
+  color: var(--light-white);
 }
+
+
+
+/* START YOUR EAXM STARTS HERE  */
+
+.ExamDetailsCards {
+
+  /* width: 350px; */
+  padding: 25px !important;
+  border-radius: 20px;
+  box-shadow: 0.3px 0.3px 8px var(--primary-color);
+}
+
+
+.examDetIcons svg {
+  font-size: 30px;
+  color: var(--heading-color);
+  text-align: center;
+}
+
+.examDetIcons {
+  margin: auto;
+  width: fit-content;
+  background-color: var(--faded-color);
+  padding: 2px 15px;
+  border-radius: 49px;
+}
+
+
+
+.btnUploads {
+  border: none;
+  padding: 5px 15px;
+  border-radius: 15px;
+  background-color: var(--faded-color);
+  color: var(--black-clr);
+}
+
+.btnContainer {
+  width: fit-content;
+  margin: auto;
+  font-weight: bold;
+}
+
+
+.ExamDetailsCards.purple {
+  background-color: var(--primary-color);
+  color: var(--light-white);
+}
+
+
+.examDetailsTitle {
+  font-weight: 700;
+}
+
+.regcogTxt {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: var(--light-white);
+  border-radius: 20px 20px 0px 0px;
+  padding: 10px;
+  font-size: 800;
+}
+
+.ExamDetailsCards.regCont {
+  padding: 0px !important;
+  padding-bottom: 25px !important;
+
+}
+
+.regCont .examContents {
+  padding: 10px 25px 5px;
+}
+
+
+.printAnsBtn {
+  background-color: var(--primary-color);
+  color: var(--light-white);
+  border: none;
+  padding: 5px 15px;
+  border-radius: 15px;
+
+}
+
+.printBtnCont {
+  width: fit-content;
+  margin: auto;
+}
+
+/* START YOUR EAXM ENDS HERE  */
+
+/* MEET OUR TEAM STARTS HERE  */
+/* 
+.teamMemDetailCont {
+  width: 250px;
+  background-color: var(--light-white);
+  padding: 15px;
+  height: fit-content;
+  box-shadow: 0.5px 0.5px 5px var(--card-bg);
+}*/
+.teamMemDetailCont {
+  width: 250px;
+  box-shadow: 0.5px 0.5px 5px var(--card-bg);
+}
+
+.cardImgBgCont {
+  height: 100px;
+  width: 250px;
+  background-color: var(--card-bg);
+  box-shadow: 0.5px 0.5px 5px var(--card-bg);
+  position: absolute;
+  top: -100px;
+  z-index: -1;
+  left: -0px;
+  border-radius: 50px 50px 0px 0px;
+}
+
+.bottomCardDetails {
+  width: 250px;
+  position: relative;
+  background-color: var(--card-bg);
+  padding: 15px;
+  height: fit-content;
+
+}
+
+.teamMemName {
+  color: var(--heading-color);
+  font-weight: 800;
+}
+
+.deptYr {
+  color: var(--heading-color);
+  font-weight: 500;
+
+}
+
+.contactLinks svg {
+  color: var(--grey-color);
+  margin-right: 15px;
+}
+
+/* MEET OUR TEAM ENDS HERE  */
+
+
+
+/* CONTACT SUPPORT STARTS HERE  */
+
+.form-control {
+  background-color: var(--input-bg) !important;
+  border-radius: 0px 20px 20px 0px !important;
+  border: none !important;
+
+}
+
+.input-group-text {
+  border-radius: 20px 0px 0px 20px !important;
+  background-color: var(--input-bg) !important;
+  border: none !important;
+
+}
+
+.input-group {
+  border: none;
+
+}
+
+.contactSupport svg {
+  font-size: 15px;
+  margin-right: 10px;
+
+}
+
+.form-control {
+  font-size: 10px;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+}
+
+/* textarea.form-control {
+  border-radius: 0px 15px 15px 0px !important;
+} */
+textarea.form-control {
+  padding: 20px;
+  border-radius: 12px !important;
+}
+
+.issuesSec {
+  display: flex;
+  padding-top: 17px !important;
+  align-items: flex-start !important;
+
+}
+
+.sendMsg {
+  background-color: var(--button-bg);
+  color: var(--light-white);
+  width: 100%;
+  padding: 10px 40px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+/* CONTACT SUPPORT ENDS HERE  */
+
+/* FOOTER STARTS HERE  */
+
+
+.footerBase {
+  font-size: 12px;
+  color: var(--grey-color);
+}
+
+
+.footerSec a {
+  color: var(--button-bg);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ourSlogan{
+  margin-top: 8px;
+  font-size: 13px;
+}
+.footerLogoName{
+  font-size: 19px;
+  font-weight: 700;
+}
+/* FOOTER ENDS HERE  */
