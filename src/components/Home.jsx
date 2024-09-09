@@ -11,7 +11,7 @@ import DemoCarosole from './DemoCarosole';
 
 const Home = () => {
     return (
-        <div>
+        <div className='homeSectionMain'>
             <IntroSec />
             <AboutUs />
             <InstructionSec />
@@ -20,7 +20,7 @@ const Home = () => {
             <ContactSupport />
             <Footer />
 
-            <DemoCarosole />
+
         </div>
     )
 }

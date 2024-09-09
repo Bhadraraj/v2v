@@ -6,7 +6,7 @@ const ContactSupport = () => {
     return (
         <section className='contactSupport'>
             <div className="container">
-            <h2 className='text-center py-2'>CONTACT SUPPOPRT</h2>
+            <h2 className='text-center py-2'>CONTACT SUPPORT</h2>
                 <div className="row d-flex justify-content-center">
                   
                     {/* <div className="col-md-4">
@@ -52,7 +52,7 @@ const ContactSupport = () => {
                         </div> */}
                         <div class="mb-3">
 
-                            <textarea class="form-control" placeholder="Email" id="exampleFormControlTextarea1" rows="3"></textarea>
+                            <textarea class="form-control" placeholder="Share Your Challenges" id="exampleFormControlTextarea1" rows="3"></textarea>
                         </div>
 
                         <button className="sendMsg">

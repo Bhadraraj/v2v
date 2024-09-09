@@ -9,7 +9,7 @@ const AboutUs = () => {
 
                 <div className="row">
                     <h2 className='text-center'>ABOUT US </h2>
-                    <div className="col-md-6">
+                    <div className="col-md-8">
 
                         <h4>
                             Mission
@@ -31,7 +31,7 @@ const AboutUs = () => {
                             experience for everyone.</p>
                     </div>
 
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                     <img src={aboutSecImg} alt=""  className='img-fluid'/>
                     </div>
                 </div>

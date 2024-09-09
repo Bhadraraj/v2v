@@ -23,6 +23,7 @@ h1 {
   font-size: 52px;
   color: var(--black-clr) !important;
   font-weight: bold;
+  /* font-family: "Yatra One", system-ui; */
 }
 
 
@@ -31,19 +32,123 @@ h2 {
   font-size: 50px;
   font-weight: bold;
 
+  /* font-family: "Yatra One", system-ui; */
   text-transform: uppercase;
 
 }
 
-p{
+h4 {
+  font-weight: 24px;
+}
+
+p {
   font-style: normal;
+  font-weight: 400;
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 /* NAV BAR STARTS HERE  */
 .bg-body-tertiary {
   background-color: var(--light-white) !important;
   box-shadow: 0.5px 0.5px 8px var(--primary-color);
+  position: fixed !important;
+  width: 100%;
+  top: 0px;
+  z-index: 100;
 }
+
+
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link.show {
+  color: var(--heading-color) !important;
+  font-weight: 600;
+}
+
+.startXamBtn {
+  background-color: var(--black-clr);
+  color: var(--light-white);
+  padding: 3px 15px;
+  border-radius: 40px;
+  font-size: 13px;
+
+}
+
+.nav-link {
+  color: var(--black-clr) !important;
+  text-transform: uppercase;
+
+  padding-right: 15px !important;
+  padding-bottom: 0px !important;
+  font-size: 14px !important;
+  /* text-decoration: none; 9*/
+  position: relative;
+}
+
+
+
+
+/* Add underline on hover */
+.nav-link:hover {
+  text-decoration: none;
+}
+
+.nav-item {
+  display: inline-block !important;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  /* Thickness of the underline */
+  left: 10px;
+
+  bottom: -5px;
+
+  /* Position the underline just below the link */
+  background-color: #000;
+  /* Color of the underline */
+  transition: width 0.6s ease;
+  /* Smooth transition */
+}
+
+.nav-link:hover::after {
+  width: 35px;
+  left: 10px;
+
+  /* Full width underline on hover */
+}
+
+
+
+
+.navbar-toggler {
+  padding: none;
+  font-size: var(--bs-navbar-toggler-font-size);
+
+  color: var(--heading-color);
+  font-size: 30px;
+  background-color: transparent;
+  border: none !important;
+
+}
+
+
+
+.navbar-toggler:focus {
+  text-decoration: none;
+  outline: 0;
+  box-shadow: none !important;
+}
+
+
+
 
 /* NAV BAR STARTS HERE  */
 
@@ -55,10 +160,14 @@ p{
 .aboutUs,
 .instructionSec,
 .startExamSec,
-.contactSupport {
+.contactSupport,
+.meetOurTeam {
   padding: 50px 0px;
 }
 
+.homeSectionMain {
+  padding-top: 50px !important;
+}
 
 
 
@@ -135,6 +244,25 @@ h1 {
 }
 
 
+/* Hide the default file input */
+.fileInput {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+.customUploadBtn {
+
+  border: none;
+  padding: 5px 15px;
+  border-radius: 15px;
+  background-color: var(--faded-color);
+  color: var(--black-clr);
+}
+
+
+
+
 .examDetIcons svg {
   font-size: 30px;
   color: var(--heading-color);
@@ -186,6 +314,7 @@ h1 {
 }
 
 .ExamDetailsCards.regCont {
+
   padding: 0px !important;
   padding-bottom: 25px !important;
 
@@ -202,7 +331,7 @@ h1 {
   border: none;
   padding: 5px 15px;
   border-radius: 15px;
-
+  margin-top: 15px;
 }
 
 .printBtnCont {
@@ -210,6 +339,25 @@ h1 {
   margin: auto;
 }
 
+.printSectionCont {
+  height: 105px !important;
+}
+
+.recogContent {
+  height: 180PX;
+  overflow: auto;
+}
+
+.deleteRegBtn{
+
+
+  border: none;
+  padding: 5px 15px;
+  border-radius: 15px;
+  background-color: var(--primary-color);
+  color: var(--light-white);
+
+}
 /* START YOUR EAXM ENDS HERE  */
 
 /* MEET OUR TEAM STARTS HERE  */
@@ -261,6 +409,14 @@ h1 {
 .contactLinks svg {
   color: var(--grey-color);
   margin-right: 15px;
+}
+
+.slick-slide {
+  /* margin-right: 1px; */
+}
+
+.meetOurTeam {
+  background-color: var(--faded-color);
 }
 
 /* MEET OUR TEAM ENDS HERE  */
@@ -343,12 +499,44 @@ textarea.form-control {
   text-decoration: none;
 }
 
-.ourSlogan{
+.ourSlogan {
   margin-top: 8px;
   font-size: 13px;
 }
-.footerLogoName{
+
+.footerLogoName {
   font-size: 19px;
   font-weight: 700;
 }
+
+.footerSec {
+  background-color: var(--faded-color);
+  padding-top: 20px;
+}
+
 /* FOOTER ENDS HERE  */
+
+
+
+
+
+
+
+
+
+/* MEDIA QUERIES STARTS HERE  */
+
+
+
+@media only screen and (max-width:992px) {
+
+  .nav-item {
+    margin-top: 16px !important;
+  }
+
+  .startXamBtn {
+    margin-bottom: 10px;
+  }
+}
+
+/* MEDIA QUERIES ENDS HERE  */
