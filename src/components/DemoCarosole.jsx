@@ -9,7 +9,12 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.m
 const DemoCarosole = () => {
     const [extractedText, setExtractedText] = useState('');
     const [isRecordingEnabled, setIsRecordingEnabled] = useState(false);
-    const [recognizedAnswer, setRecognizedAnswer] = useState('');
+    const [recognizedAnswers, setRecognizedAnswers] = useState({
+        answers: '',
+        currentQuestionNumber: 1
+    });
+    const [currentTextPosition, setCurrentTextPosition] = useState(0); // Track the reading position
+    const [isExamCompleted, setIsExamCompleted] = useState(false); // Track exam completion
 
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
@@ -54,34 +59,45 @@ const DemoCarosole = () => {
         document.getElementById('fileInput').click();
     };
 
-    const readTextAloud = (text) => {
-        const endIndex = text.indexOf('END');
-        const textToRead = endIndex !== -1 ? text.substring(0, endIndex) : text;
+    const readNextQuestion = (text, position) => {
+        const nextEnd = text.indexOf('END', position);
+        if (nextEnd === -1 || position >= text.length) {
+            // No more questions, exam is completed
+            const utterance = new SpeechSynthesisUtterance("Exam Completed");
+            utterance.onend = () => {
+                setIsRecordingEnabled(false); // Disable recording
+                setIsExamCompleted(true); // Mark the exam as completed
+            };
+            window.speechSynthesis.speak(utterance);
+        } else {
+            // Extract and read the next question
+            const nextQuestion = text.substring(position, nextEnd);
+            const utterance = new SpeechSynthesisUtterance(nextQuestion);
 
-        const utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.onend = () => {
+                setIsRecordingEnabled(true); // Enable recording after the question is read
+            };
 
-        utterance.onend = () => {
-            // Enable "Start Recording" button after reading is done
-            setIsRecordingEnabled(true);
-        };
-
-        window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.speak(utterance);
+            setCurrentTextPosition(nextEnd + 3); // Move to the next position after "END"
+        }
     };
 
-    // Read aloud only when text is updated and not empty, and stop at "END"
     useEffect(() => {
-        if (extractedText) {
-            readTextAloud(extractedText);
+        if (extractedText && currentTextPosition === 0) {
+            // Start reading the first question if text is available
+            readNextQuestion(extractedText, currentTextPosition);
         }
     }, [extractedText]);
 
     const handleDeleteText = () => {
         setExtractedText('');
-        window.speechSynthesis.cancel();  // Stop any ongoing speech
-        setIsRecordingEnabled(false);  // Disable recording button
+        window.speechSynthesis.cancel();
+        setIsRecordingEnabled(false);
+        setCurrentTextPosition(0); // Reset text position
+        setIsExamCompleted(false); // Reset exam status
     };
 
-    // Record answer and convert it to text using Web Speech API
     const startRecordingAnswer = () => {
         const recognition = new window.webkitSpeechRecognition();
         recognition.lang = 'en-US';
@@ -90,14 +106,46 @@ const DemoCarosole = () => {
 
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
-            setRecognizedAnswer(transcript);
+
+            if (transcript.toLowerCase().includes('stop')) {
+                recognition.stop(); // Stop recording when "STOP" is heard
+                setIsRecordingEnabled(false);
+                // Automatically read the next question
+                readNextQuestion(extractedText, currentTextPosition);
+            } else {
+                // Append the user's answer
+                setRecognizedAnswers(prevState => ({
+                    ...prevState,
+                    answers: `${prevState.answers}\nQuestion Number ${prevState.currentQuestionNumber}: ${transcript}`,
+                    currentQuestionNumber: prevState.currentQuestionNumber + 1
+                }));
+            }
+        };
+
+        recognition.onend = () => {
+            if (!isExamCompleted) {
+                recognition.start(); // Continue listening if the exam is not completed
+            }
         };
 
         recognition.start();
+    };
 
-        recognition.onend = () => {
-            console.log('Recording finished');
+    const startAutomaticRecording = () => {
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+
+            if (transcript.toLowerCase().includes('arambikalama')) {
+                startRecordingAnswer();
+            }
         };
+
+        recognition.start();
     };
 
     return (
@@ -118,7 +166,6 @@ const DemoCarosole = () => {
                                 <p>Please upload the question paper in PDF or image format (JPG, PNG). The maximum file size allowed is 5MB.</p>
                             </div>
                             <div className="btnContainer">
-                                {/* Hidden file input */}
                                 <input
                                     type="file"
                                     accept="image/*,.pdf"
@@ -126,7 +173,6 @@ const DemoCarosole = () => {
                                     className="fileInput"
                                     id="fileInput"
                                 />
-                                {/* Custom button */}
                                 <button className="customUploadBtn" onClick={handleButtonClick}>
                                     Upload File
                                 </button>
@@ -142,29 +188,16 @@ const DemoCarosole = () => {
                             <div className="examContents recogContent">
                                 <p>{extractedText || 'No text recognized yet.'}</p>
                             </div>
-
-                            {/* Display "Delete" button only if text is recognized */}
-                            {extractedText && (
-
-<div className="btnContainer">
-<button
-    className="btnUploads deleteRegBtn" onClick={handleDeleteText}>
-{/* <button
-    className="btnUploads"
-    disabled={!isRecordingEnabled}
-    onClick={startRecordingAnswer}
-> */}
-Delete Recognized Text
-</button>
-</div>
-
-
-                                // <div className="btnContainer">
-                                //     <button className="customDeleteBtn" onClick={handleDeleteText}>
-                                //         Delete Recognized Text
-                                //     </button>
-                                // </div>
-                            )}
+                            <div className="btnContainer">
+                                {extractedText && (
+                                    <button
+                                        className="btnUploads deleteRegBtn"
+                                        onClick={handleDeleteText}
+                                    >
+                                        Delete Recognized Text
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -180,10 +213,9 @@ Delete Recognized Text
                                 <p>Click the "Start Recording" button to record your answer. Ensure your microphone is on and working.</p>
                             </div>
                             <div className="btnContainer">
-                                {/* Enable Start Recording button only when question is fully read */}
                                 <button
                                     className="btnUploads"
-                                    disabled={!isRecordingEnabled}
+                                    disabled={!isRecordingEnabled || isExamCompleted}
                                     onClick={startRecordingAnswer}
                                 >
                                     Start Recording
@@ -198,7 +230,7 @@ Delete Recognized Text
                                 <p className="mb-0 text-center">Recognized Answer</p>
                             </div>
                             <div className="examContents recogContent printSectionCont">
-                                <p>{recognizedAnswer || 'No answer recognized yet.'}</p>
+                                <p dangerouslySetInnerHTML={{ __html: recognizedAnswers.answers.replace(/\n/g, '<br/>') }} />
                             </div>
                             <div className="printBtnCont">
                                 <button className="printAnsBtn">Print the Answer</button>

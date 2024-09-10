@@ -243,6 +243,11 @@ h1 {
   box-shadow: 0.3px 0.3px 8px var(--primary-color);
 }
 
+.recogContent {
+  white-space: pre-line;
+  /* This preserves whitespace and newlines */
+}
+
 
 /* Hide the default file input */
 .fileInput {
@@ -348,7 +353,7 @@ h1 {
   overflow: auto;
 }
 
-.deleteRegBtn{
+.deleteRegBtn {
 
 
   border: none;
@@ -358,6 +363,7 @@ h1 {
   color: var(--light-white);
 
 }
+
 /* START YOUR EAXM ENDS HERE  */
 
 /* MEET OUR TEAM STARTS HERE  */
