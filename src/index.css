@@ -162,17 +162,14 @@ body {
 .startExamSec,
 .contactSupport,
 .meetOurTeam {
-  padding: 50px 0px;
+  padding: 90px 0px;
 }
 
 .homeSectionMain {
   padding-top: 50px !important;
 }
 
-
-
 /* iNTRO SECTION STARTS HERE  */
-
 
 .titleHighlight {
   color: var(--primary-color);

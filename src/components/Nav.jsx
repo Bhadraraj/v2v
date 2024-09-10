@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { CgMenuRightAlt } from "react-icons/cg"
+import { CgMenuRightAlt } from "react-icons/cg";
+ import logo from '../images/v2v.png'
 const Nav = () => {
 
 
@@ -16,7 +17,8 @@ const Nav = () => {
 
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
-                <a className="navbar-brand" href="#">V2V</a>
+                {/* <a className="navbar-brand" href="#">V2V</a> */}
+                <a className="navbar-brand" href="#"> <img src={logo} alt="" height={50}/></a>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     {/* <span className="navbar-toggler-icon"></span> */}
                     <CgMenuRightAlt />
