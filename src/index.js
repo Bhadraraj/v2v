@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-
-
 import DemoCarosole from './components/DemoCarosole'
+import Demo from './components/Demo'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    {/* <App /> */}
     {/* <DemoCarosole /> */}
+    <Demo />
   </React.StrictMode>
 );
 

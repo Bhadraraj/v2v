@@ -29,7 +29,7 @@ const InstructionSec = () => {
                                 Listen to Questions
                             </p>
                             <p className="instructCont">
-                                The system will read each question aloud for you, providing clear audio output. Simply listen to the question being read out and prepare your answer.
+                                The system will read each question aloud, providing clear audio output. Simply listen to the question being read out and prepare your answer.
                             </p>
                         </div>
                     </div>
