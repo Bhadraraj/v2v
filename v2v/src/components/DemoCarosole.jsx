@@ -3,27 +3,18 @@ import { IoCloudUploadSharp } from "react-icons/io5";
 import { FaMicrophoneAlt } from "react-icons/fa";
 import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
-import jsPDF from 'jspdf';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.mjs`;
 
-const NEXT_COMMAND = "next";
-const START_YOUR_ANSWER = "START YOUR ANSWER";
-const END_MARKER = "END";
-const EXAM_COMPLETED_MESSAGE = "Exam Completed";
-
-const Demo = () => {
+const DemoCarosole = () => {
     const [extractedText, setExtractedText] = useState('');
     const [isRecordingEnabled, setIsRecordingEnabled] = useState(false);
     const [recognizedAnswers, setRecognizedAnswers] = useState({
         answers: '',
         currentQuestionNumber: 1
     });
-    const [currentTextPosition, setCurrentTextPosition] = useState(0);
-    const [isExamCompleted, setIsExamCompleted] = useState(false);
-    const [recognitionInstance, setRecognitionInstance] = useState(null);
-    const [isReadyToRecord, setIsReadyToRecord] = useState(false);
-    const [currentAnswer, setCurrentAnswer] = useState("");
+    const [currentTextPosition, setCurrentTextPosition] = useState(0); // Track the reading position
+    const [isExamCompleted, setIsExamCompleted] = useState(false); // Track exam completion
 
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
@@ -64,145 +55,97 @@ const Demo = () => {
         reader.readAsArrayBuffer(file);
     };
 
-
-    const startRecordingAnswer = () => {
-        const recognition = new window.webkitSpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.interimResults = true; // Keep capturing interim results
-        recognition.maxAlternatives = 1;
-
-        let answerBuffer = ""; // Buffer to store the entire answer
-        recognition.onresult = (event) => {
-            let interimTranscript = ""; // For interim results
-
-            // Loop through results and capture all interim results
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                const transcript = event.results[i][0].transcript.trim();
-
-                if (event.results[i].isFinal) {
-                    answerBuffer += ` ${transcript}`; // Append final results to answer buffer
-                } else {
-                    interimTranscript += ` ${transcript}`; // Capture interim results for live feedback (optional)
-                }
-
-                // If user says 'NEXT', stop recording and save the answer
-                if (transcript.toLowerCase().includes(NEXT_COMMAND)) {
-                    stopRecording(); // Stop the recognition
-                    answerBuffer = answerBuffer.trim(); // Clean up the final answer buffer
-
-                    // Append the current answer to the answers list and move to the next question
-                    setRecognizedAnswers((prevState) => ({
-                        ...prevState,
-                        answers: `${prevState.answers}\nAnswer ${prevState.currentQuestionNumber}: ${answerBuffer}`,
-                        currentQuestionNumber: prevState.currentQuestionNumber + 1,
-                    }));
-                    setCurrentAnswer(''); // Reset the answer buffer for the next question
-                    return; // Exit to avoid processing 'NEXT' as part of the answer
-                }
-            }
-
-            console.log("Interim Transcript: ", interimTranscript); // Optional: for debugging interim results
-        };
-
-        recognition.onend = () => {
-            // Automatically restart recognition if still ready to record
-            if (isReadyToRecord) {
-                recognition.start();
-            }
-        };
-
-        recognition.onerror = (event) => {
-            console.error("Speech recognition error: ", event.error);
-        };
-
-        recognition.start(); // Start the recognition
-        setRecognitionInstance(recognition);
-        setIsRecordingEnabled(true); // Set recording as enabled
-    };
-
-
-
-    const readNextQuestion = (text, position) => {
-        const nextEnd = text.indexOf(END_MARKER, position);
-
-        if (nextEnd === -1 || position >= text.length) {
-            const utterance = new SpeechSynthesisUtterance(EXAM_COMPLETED_MESSAGE);
-            utterance.onend = () => {
-                setIsRecordingEnabled(false); // Stop recording when exam ends
-                setIsExamCompleted(true);
-            };
-            window.speechSynthesis.speak(utterance);
-        } else {
-            const nextQuestion = text.substring(position, nextEnd);
-            const utterance = new SpeechSynthesisUtterance(nextQuestion);
-
-            setIsReadyToRecord(false);
-            console.log("Reading question: ", nextQuestion);
-
-            utterance.onend = () => {
-                console.log("System finished reading question. Prompting to start answer.");
-                const startAnswerPrompt = new SpeechSynthesisUtterance(START_YOUR_ANSWER);
-                startAnswerPrompt.onend = () => {
-                    console.log("'START YOUR ANSWER' command finished. Ready to record now.");
-                    setIsReadyToRecord(true);
-                    startRecordingAnswer();
-                };
-                window.speechSynthesis.speak(startAnswerPrompt);
-            };
-
-            window.speechSynthesis.speak(utterance);
-            setCurrentTextPosition(nextEnd + END_MARKER.length);
-        }
-    };
-
-    const stopRecording = () => {
-        if (recognitionInstance) {
-            recognitionInstance.stop(); // Stop recognition
-            setIsRecordingEnabled(false); // Set recording state to false
-            console.log("Recording stopped.");
-        }
-    };
-
-
-    const nextQuestion = () => {
-        stopRecording();
-        readNextQuestion(extractedText, currentTextPosition);
-    };
-
-
-
-    useEffect(() => {
-        if (extractedText && currentTextPosition === 0) {
-            readNextQuestion(extractedText, currentTextPosition);
-        }
-    }, [extractedText]);
-
     const handleButtonClick = () => {
         document.getElementById('fileInput').click();
     };
+
+    const readNextQuestion = (text, position) => {
+        const nextEnd = text.indexOf('END', position);
+        if (nextEnd === -1 || position >= text.length) {
+            // No more questions, exam is completed
+            const utterance = new SpeechSynthesisUtterance("Exam Completed");
+            utterance.onend = () => {
+                setIsRecordingEnabled(false); // Disable recording
+                setIsExamCompleted(true); // Mark the exam as completed
+            };
+            window.speechSynthesis.speak(utterance);
+        } else {
+            // Extract and read the next question
+            const nextQuestion = text.substring(position, nextEnd);
+            const utterance = new SpeechSynthesisUtterance(nextQuestion);
+
+            utterance.onend = () => {
+                setIsRecordingEnabled(true); // Enable recording after the question is read
+            };
+
+            window.speechSynthesis.speak(utterance);
+            setCurrentTextPosition(nextEnd + 3); // Move to the next position after "END"
+        }
+    };
+
+    useEffect(() => {
+        if (extractedText && currentTextPosition === 0) {
+            // Start reading the first question if text is available
+            readNextQuestion(extractedText, currentTextPosition);
+        }
+    }, [extractedText]);
 
     const handleDeleteText = () => {
         setExtractedText('');
         window.speechSynthesis.cancel();
         setIsRecordingEnabled(false);
-        setCurrentTextPosition(0);
-        setIsExamCompleted(false);
+        setCurrentTextPosition(0); // Reset text position
+        setIsExamCompleted(false); // Reset exam status
     };
 
+    const startRecordingAnswer = () => {
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
 
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
 
+            if (transcript.toLowerCase().includes('stop')) {
+                recognition.stop(); // Stop recording when "STOP" is heard
+                setIsRecordingEnabled(false);
+                // Automatically read the next question
+                readNextQuestion(extractedText, currentTextPosition);
+            } else {
+                // Append the user's answer
+                setRecognizedAnswers(prevState => ({
+                    ...prevState,
+                    answers: `${prevState.answers}\nQuestion Number ${prevState.currentQuestionNumber}: ${transcript}`,
+                    currentQuestionNumber: prevState.currentQuestionNumber + 1
+                }));
+            }
+        };
 
-    const downloadAnswers = () => {
-        const doc = new jsPDF();
-        doc.text(recognizedAnswers.answers, 10, 10);
-        doc.save("answers.pdf");
+        recognition.onend = () => {
+            if (!isExamCompleted) {
+                recognition.start(); // Continue listening if the exam is not completed
+            }
+        };
+
+        recognition.start();
     };
 
-    const printAnswers = () => {
-        const answerWindow = window.open("", "", "width=600,height=400");
-        answerWindow.document.write("<pre>" + recognizedAnswers.answers + "</pre>");
-        answerWindow.document.close();
-        answerWindow.print();
+    const startAutomaticRecording = () => {
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+
+            if (transcript.toLowerCase().includes('arambikalama')) {
+                startRecordingAnswer();
+            }
+        };
+
+        recognition.start();
     };
 
     return (
@@ -264,54 +207,40 @@ const Demo = () => {
                                 <FaMicrophoneAlt />
                             </div>
                             <div className="examDetailsTitle">
-                                <p>Start Answering</p>
+                                <p>Record Your Answer</p>
                             </div>
                             <div className="examContents">
-                                <p>Press the button below to answer the question.</p>
+                                <p>Click the "Start Recording" button to record your answer. Ensure your microphone is on and working.</p>
                             </div>
                             <div className="btnContainer">
-                                {/* {isRecordingEnabled ? (
-                                    <button className="customUploadBtn" disabled>
-                                        Recording...
-                                    </button>
-                                ) : ( */}
                                 <button
-                                    className="customUploadBtn"
-                                    onClick={nextQuestion}
-                                    disabled={!extractedText || isExamCompleted}
+                                    className="btnUploads"
+                                    disabled={!isRecordingEnabled || isExamCompleted}
+                                    onClick={startRecordingAnswer}
                                 >
-                                    Next Question
+                                    Start Recording
                                 </button>
-                                {/* )} */}
                             </div>
-                        </div>
-                    </div>
-                    <div className="col-md-6 col-lg-6">
-                        <div className="ExamDetailsCards regCont white">
-                            <div className="regcogTxt mb-2">
-                                <p className="mb-0 text-center">Recognized Answers</p>
-                            </div>
-                            <div className="examContents recogContent">
-                                {/* Real-time update of recognized answers */}
-                                <p>{recognizedAnswers.answers || 'No answers recorded yet.'}</p>
-                            </div>
-                            {recognizedAnswers.answers && (
-                                <div className="btnContainer">
-                                    <button className="btnUploads printBtn" onClick={printAnswers}>
-                                        Print Answers
-                                    </button>
-                                    <button className="btnUploads downloadBtn" onClick={downloadAnswers}>
-                                        Download as PDF
-                                    </button>
-                                </div>
-                            )}
                         </div>
                     </div>
 
+                    <div className="col-md-6 col-lg-6">
+                        <div className="ExamDetailsCards regCont white">
+                            <div className="regcogTxt mb-2">
+                                <p className="mb-0 text-center">Recognized Answer</p>
+                            </div>
+                            <div className="examContents recogContent printSectionCont">
+                                <p dangerouslySetInnerHTML={{ __html: recognizedAnswers.answers.replace(/\n/g, '<br/>') }} />
+                            </div>
+                            <div className="printBtnCont">
+                                <button className="printAnsBtn">Print the Answer</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     );
 };
 
-export default Demo;
+export default DemoCarosole;

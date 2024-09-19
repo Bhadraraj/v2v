@@ -7,13 +7,7 @@ import jsPDF from 'jspdf';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.mjs`;
 
-// Constants for commands
-const NEXT_COMMAND = "next";
-const START_YOUR_ANSWER = "START YOUR ANSWER";
-const END_MARKER = "END";
-const EXAM_COMPLETED_MESSAGE = "Exam Completed";
-
-const StartExam = () => {
+const Demo = () => {
     const [extractedText, setExtractedText] = useState('');
     const [isRecordingEnabled, setIsRecordingEnabled] = useState(false);
     const [recognizedAnswers, setRecognizedAnswers] = useState({
@@ -24,7 +18,6 @@ const StartExam = () => {
     const [isExamCompleted, setIsExamCompleted] = useState(false);
     const [recognitionInstance, setRecognitionInstance] = useState(null);
     const [isReadyToRecord, setIsReadyToRecord] = useState(false);
-    const [currentAnswer, setCurrentAnswer] = useState(""); // Store the current answer
 
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
@@ -65,76 +58,46 @@ const StartExam = () => {
         reader.readAsArrayBuffer(file);
     };
 
-
     const startRecordingAnswer = () => {
         const recognition = new window.webkitSpeechRecognition();
         recognition.lang = 'en-US';
-        // recognition.interimResults = false;
-        recognition.interimResults = true;
-
+        recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
-        let answerBuffer = ""; // Buffer to store the full answer
         recognition.onresult = (event) => {
-            let finalTranscript = ''; // For final results only
+            const transcript = event.results[0][0].transcript.trim();
 
-            // Loop through results and only store the final transcript
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                const transcript = event.results[i][0].transcript.trim();
-
-                if (event.results[i].isFinal) {
-                    // If it's a final result, store the final transcript
-                    finalTranscript += ` ${transcript}`;
-                }
+            if (transcript.toLowerCase() === 'next') {
+                stopRecording();
+                setIsReadyToRecord(false); // Prevent automatic restarting
+                readNextQuestion(extractedText, currentTextPosition);
+                return;
             }
 
-            // Only update the state once the final result is obtained
-            if (finalTranscript) {
-                answerBuffer = finalTranscript.trim();
-                console.log("Final Answer buffer updated: ", answerBuffer); // Debugging line
-                // Update the recognized answers state with only the final answer and increment the question number
-                setRecognizedAnswers((prevState) => ({
-                    ...prevState,
-                    answers: `${prevState.answers}\nAnswer ${prevState.currentQuestionNumber}: ${answerBuffer}`, // Append new answer
-                    currentQuestionNumber: prevState.currentQuestionNumber + 1, // Increment question number
-                }));
-
-                // Increment question number for the next answer
-                setCurrentAnswer(''); // Clear current answer buffer for next question
-            }
+            setRecognizedAnswers(prevState => ({
+                ...prevState,
+                answers: `${prevState.answers}\nQuestion ${prevState.currentQuestionNumber}: ${transcript}`,
+                currentQuestionNumber: prevState.currentQuestionNumber + 1
+            }));
         };
-
-
-
 
         recognition.onend = () => {
-            console.log("Recognition ended. isReadyToRecord:", isReadyToRecord); // Debugging line
             if (isReadyToRecord) {
-                // Restart recognition automatically if still ready to record
-                recognition.start();
-                console.log("Recognition restarted automatically."); // Debugging line
+                recognition.start(); // Keep listening if ready to record
             }
         };
 
-        recognition.onerror = (event) => {
-            console.error("Speech recognition error: ", event.error); // Debugging line
-        };
-
-        console.log("Starting recognition..."); // Debugging line
-        recognition.start(); // Start listening immediately
+        recognition.start();
         setRecognitionInstance(recognition);
-        setIsRecordingEnabled(true); // Recording is enabled
+        setIsRecordingEnabled(true);
     };
 
-    // Logic for reading the next question
     const readNextQuestion = (text, position) => {
-        const nextEnd = text.indexOf(END_MARKER, position);
-
-        // Handle end of exam case
+        const nextEnd = text.indexOf('END', position);
         if (nextEnd === -1 || position >= text.length) {
-            const utterance = new SpeechSynthesisUtterance(EXAM_COMPLETED_MESSAGE);
+            const utterance = new SpeechSynthesisUtterance("Exam Completed");
             utterance.onend = () => {
-                setIsRecordingEnabled(false); // Stop recording when exam ends
+                setIsRecordingEnabled(false);
                 setIsExamCompleted(true);
             };
             window.speechSynthesis.speak(utterance);
@@ -142,48 +105,30 @@ const StartExam = () => {
             const nextQuestion = text.substring(position, nextEnd);
             const utterance = new SpeechSynthesisUtterance(nextQuestion);
 
-            // Disable recording while system is speaking
-            setIsReadyToRecord(false); // Prevent recording during question reading
-            console.log("Reading question: ", nextQuestion); // Debugging line
-
             utterance.onend = () => {
-                console.log("System finished reading question. Prompting to start answer."); // Debugging line
-                // Prompt the user to start answering
-                const startAnswerPrompt = new SpeechSynthesisUtterance(START_YOUR_ANSWER);
+                const startAnswerPrompt = new SpeechSynthesisUtterance("START YOUR ANSWER");
                 startAnswerPrompt.onend = () => {
-                    console.log("'START YOUR ANSWER' command finished. Ready to record now."); // Debugging line
-                    setIsReadyToRecord(true); // Ready to record after prompt
-                    startRecordingAnswer(); // Restart recording
+                    setIsReadyToRecord(true); // Enable recording
                 };
                 window.speechSynthesis.speak(startAnswerPrompt);
             };
 
             window.speechSynthesis.speak(utterance);
-            setCurrentTextPosition(nextEnd + END_MARKER.length); // Update position for the next question
+            setCurrentTextPosition(nextEnd + 3);
         }
     };
-
-    const stopRecording = () => {
-        if (recognitionInstance) {
-            recognitionInstance.stop(); // Stop the current recognition instance
-            setIsRecordingEnabled(false); // Disable recording state
-            console.log("Recording stopped."); // Debugging line
-        }
-    };
-
-    // Manually move to the next question (in case there's a "Next" button)
-    const nextQuestion = () => {
-        stopRecording(); // Stop recording for the current question
-        readNextQuestion(extractedText, currentTextPosition); // Move to next question
-    };
-
-
 
     useEffect(() => {
         if (extractedText && currentTextPosition === 0) {
             readNextQuestion(extractedText, currentTextPosition);
         }
     }, [extractedText]);
+
+    useEffect(() => {
+        if (isReadyToRecord) {
+            startRecordingAnswer();
+        }
+    }, [isReadyToRecord]);
 
     const handleButtonClick = () => {
         document.getElementById('fileInput').click();
@@ -197,8 +142,17 @@ const StartExam = () => {
         setIsExamCompleted(false);
     };
 
+    const stopRecording = () => {
+        if (recognitionInstance) {
+            recognitionInstance.stop();
+            setIsRecordingEnabled(false);
+        }
+    };
 
-
+    const nextQuestion = () => {
+        stopRecording();
+        readNextQuestion(extractedText, currentTextPosition);
+    };
 
     const downloadAnswers = () => {
         const doc = new jsPDF();
@@ -272,47 +226,45 @@ const StartExam = () => {
                                 <FaMicrophoneAlt />
                             </div>
                             <div className="examDetailsTitle">
-                                <p>Start Answering</p>
+                                <p>Record Your Answer</p>
                             </div>
                             <div className="examContents">
-                                <p>Press the button below to answer the question.</p>
+                                <p>Click the "Next Question" button to move to the next question. Ensure your microphone is on and working.</p>
                             </div>
                             <div className="btnContainer">
-                                {/* {isRecordingEnabled ? (
-                                    <button className="customUploadBtn" disabled>
-                                        Recording...
-                                    </button>
-                                ) : ( */}
                                 <button
-                                    className="customUploadBtn"
+                                    className="btnUploads"
+                                    disabled={isExamCompleted}
                                     onClick={nextQuestion}
-                                    disabled={!extractedText || isExamCompleted}
                                 >
                                     Next Question
                                 </button>
-                                {/* )} */}
                             </div>
                         </div>
                     </div>
+
                     <div className="col-md-6 col-lg-6">
                         <div className="ExamDetailsCards regCont white">
                             <div className="regcogTxt mb-2">
                                 <p className="mb-0 text-center">Recognized Answers</p>
                             </div>
                             <div className="examContents recogContent">
-                                {/* Real-time update of recognized answers */}
-                                <p>{recognizedAnswers.answers || 'No answers recorded yet.'}</p>
+                                <p>{recognizedAnswers.answers || 'No answers recognized yet.'}</p>
                             </div>
-                            {recognizedAnswers.answers && (
-                                <div className="btnContainer">
-                                    <button className="btnUploads printBtn" onClick={printAnswers}>
-                                        Print Answers
-                                    </button>
-                                    <button className="btnUploads downloadBtn" onClick={downloadAnswers}>
-                                        Download as PDF
-                                    </button>
-                                </div>
-                            )}
+                            <div className="btnContainer">
+                                <button
+                                    className="btnUploads deleteRegBtn"
+                                    onClick={downloadAnswers}
+                                >
+                                    Download Answers
+                                </button>
+                                <button
+                                    className="btnUploads"
+                                    onClick={printAnswers}
+                                >
+                                    Print Answers
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -322,4 +274,4 @@ const StartExam = () => {
     );
 };
 
-export default StartExam;
+export default Demo;
